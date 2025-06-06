@@ -1,0 +1,4 @@
+com\obra\pontoeletronico\integration\AuthIntegrationTest.class
+com\obra\pontoeletronico\service\AuthServiceTest.class
+com\obra\pontoeletronico\service\DashboardServiceTest.class
+com\obra\pontoeletronico\service\RegistroPontoServiceTest.class

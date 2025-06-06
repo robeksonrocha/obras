@@ -104,7 +104,10 @@ export default function ListaRegistrosPonto() {
             await carregarRegistros();
         } catch (error) {
             console.error('Erro ao carregar dados:', error);
-            alert('Erro ao carregar dados');
+            enqueueSnackbar('Erro ao carregar dados iniciais. Tente novamente.', { 
+                variant: 'error',
+                autoHideDuration: 3000
+            });
         }
     };
 
@@ -257,7 +260,10 @@ export default function ListaRegistrosPonto() {
             carregarRegistros();
         } catch (error) {
             console.error('Erro ao salvar registro:', error);
-            alert('Erro ao salvar registro');
+            enqueueSnackbar('Erro ao salvar registro. Tente novamente.', { 
+                variant: 'error',
+                autoHideDuration: 3000
+            });
         }
     };
 
@@ -414,10 +420,15 @@ export default function ListaRegistrosPonto() {
                     autoHeight
                 />
 
-                <Paper sx={{ p: 2, mb: 2 }}>
+                <Paper sx={{ p: 3, mb: 2 }}>
                     <Stack spacing={2}>
-                        <Stack direction="row" spacing={2} flexWrap="wrap">
-                            <FormControl sx={{ minWidth: 240, flex: 1 }}>
+                        <Stack
+                            direction="row"
+                            columnGap={2}
+                            rowGap={5}
+                            flexWrap="wrap"
+                        >
+                            <FormControl sx={{ width: { xs: '100%', sm: '48%', md: '23%' } }}>
                                 <InputLabel>Funcionário</InputLabel>
                                 <Select
                                     label="Funcionário"
@@ -432,7 +443,7 @@ export default function ListaRegistrosPonto() {
                                     ))}
                                 </Select>
                             </FormControl>
-                            <FormControl sx={{ minWidth: 240, flex: 1 }}>
+                            <FormControl sx={{ width: { xs: '100%', sm: '48%', md: '23%' } }}>
                                 <InputLabel>Obra</InputLabel>
                                 <Select
                                     label="Obra"
@@ -447,7 +458,7 @@ export default function ListaRegistrosPonto() {
                                     ))}
                                 </Select>
                             </FormControl>
-                            <Box sx={{ minWidth: 240, flex: 1 }}>
+                            <Box sx={{ width: { xs: '100%', sm: '48%', md: '23%' } }}>
                                 <DatePicker
                                     label="Data Início"
                                     value={dataInicio}
@@ -460,7 +471,7 @@ export default function ListaRegistrosPonto() {
                                     format="dd/MM/yyyy"
                                 />
                             </Box>
-                            <Box sx={{ minWidth: 240, flex: 1 }}>
+                            <Box sx={{ width: { xs: '100%', sm: '48%', md: '23%' } }}>
                                 <DatePicker
                                     label="Data Fim"
                                     value={dataFim}
@@ -473,12 +484,10 @@ export default function ListaRegistrosPonto() {
                                     format="dd/MM/yyyy"
                                 />
                             </Box>
-                            <Box sx={{ minWidth: 240, flex: 1 }}>
+                            <Box sx={{ width: { xs: '100%', sm: '48%', md: '23%' } }}>
                                 <Button
                                     variant="contained"
                                     onClick={handleFiltrar}
-                                    disabled={loading}
-                                    startIcon={loading ? <CircularProgress size={20} /> : undefined}
                                 >
                                     Filtrar
                                 </Button>
@@ -621,8 +630,8 @@ export default function ListaRegistrosPonto() {
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseDialog}>Cancelar</Button>
-                        <Button onClick={handleSave} variant="contained" disabled={loading}>
-                            {loading ? <CircularProgress size={24} /> : 'Salvar'}
+                        <Button onClick={handleSave} variant="contained">
+                            {'Salvar'}
                         </Button>
                     </DialogActions>
                 </Dialog>

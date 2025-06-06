@@ -300,8 +300,8 @@ export default function ListaObras() {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog}>Cancelar</Button>
-            <Button onClick={handleSave} variant="contained" disabled={loading}>
-              {loading ? <CircularProgress size={24} /> : 'Salvar'}
+            <Button onClick={handleSave} variant="contained">
+              {'Salvar'}
             </Button>
           </DialogActions>
         </Dialog>

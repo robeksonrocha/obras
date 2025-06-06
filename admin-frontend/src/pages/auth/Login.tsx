@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Paper,
@@ -9,24 +9,43 @@ import {
     Snackbar,
     Alert
 } from '@mui/material';
-import { authService, LoginCredentials } from '../../services/authService';
+import { LoginCredentials } from '../../services/authService';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 export default function Login() {
     const navigate = useNavigate();
+    const { login, isAuthenticated } = useAuth();
     const [credentials, setCredentials] = useState<LoginCredentials>({
         email: '',
         senha: ''
     });
     const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (isAuthenticated) {
+            console.log('isAuthenticated changed to true, navigating to /...');
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('Submit button clicked!');
         try {
-            await authService.login(credentials);
-            navigate('/');
-        } catch (err) {
-            setError('Email ou senha inválidos');
+            // Comentado para desenvolvimento local:
+            // await authService.login(credentials);
+
+            // Simula login bem-sucedido E atualiza o estado no contexto:
+            login('dummy-token-for-dev');
+
+            // Removemos a navegação direta daqui, ela será tratada pelo useEffect
+            //  navigate('/');
+            //  console.log('Navigated!');
+
+        } catch (err: any) {
+            console.error('Login simulation failed:', err);
+            setError(err.response?.data?.message || 'Erro ao fazer login');
         }
     };
 

@@ -30,7 +30,7 @@ import ListaFuncionarios from './pages/funcionarios/ListaFuncionarios';
 import ListaObras from './pages/obras/ListaObras';
 import ListaRegistrosPonto from './pages/registros/ListaRegistrosPonto';
 import Login from './pages/auth/Login';
-import { authService } from './services/authService';
+import { useAuth } from './context/AuthContext';
 
 const theme = createTheme({
   palette: {
@@ -48,28 +48,17 @@ const theme = createTheme({
 
 const drawerWidth = 240;
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = authService.isAuthenticated();
-  const location = useLocation();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-
-  return <>{children}</>;
-}
-
 function MainContent() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
   const handleLogout = () => {
-    authService.logout();
-    navigate('/login');
+    logout();
   };
 
   const menuItems = [
@@ -148,45 +137,61 @@ function MainContent() {
           flexGrow: 1,
           p: 3,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          mt: 8
+          mt: 8,
+          pb: 6,
         }}
       >
         <Container maxWidth="lg">
           <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } />
-            <Route path="/funcionarios" element={
-              <PrivateRoute>
-                <ListaFuncionarios />
-              </PrivateRoute>
-            } />
-            <Route path="/obras" element={
-              <PrivateRoute>
-                <ListaObras />
-              </PrivateRoute>
-            } />
-            <Route path="/registros" element={
-              <PrivateRoute>
-                <ListaRegistrosPonto />
-              </PrivateRoute>
-            } />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/funcionarios" element={<ListaFuncionarios />} />
+            <Route path="/obras" element={<ListaObras />} />
+            <Route path="/registros" element={<ListaRegistrosPonto />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Container>
+      </Box>
+
+      <Box
+        component="footer"
+        sx={{
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+          p: 2,
+          bgcolor: 'background.paper',
+          textAlign: 'center',
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+      >
+        <Typography variant="body2" color="text.secondary">
+          © {new Date().getFullYear()} Sistema de Ponto Eletrônico. Todos os direitos reservados.
+        </Typography>
       </Box>
     </Box>
   );
 }
 
 function App() {
+  const { isAuthenticated } = useAuth();
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <MainContent />
+        <Routes>
+          {isAuthenticated ? (
+            <Route path="*" element={<MainContent />} />
+          ) : (
+            <>
+              <Route path="/login" element={<Login />} />
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </>
+          )}
+        </Routes>
       </BrowserRouter>
     </ThemeProvider>
   );

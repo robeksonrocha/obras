@@ -21,6 +21,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import api from '../services/api';
+import { useSnackbar } from 'notistack';
 
 interface Usuario {
   id: number;
@@ -43,6 +44,7 @@ const Relatorios = () => {
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<number | ''>('');
   const [registros, setRegistros] = useState<RegistroPonto[]>([]);
   const [loading, setLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     carregarUsuarios();
@@ -54,13 +56,13 @@ const Relatorios = () => {
       setUsuarios(response.data);
     } catch (error) {
       console.error(error);
-      alert('Erro ao carregar usuários');
+      enqueueSnackbar('Erro ao carregar usuários', { variant: 'error' });
     }
   };
 
   const buscarRelatorio = async () => {
     if (!dataInicio || !dataFim || !usuarioSelecionado) {
-      alert('Preencha todos os campos');
+      enqueueSnackbar('Preencha todos os campos obrigatórios', { variant: 'warning' });
       return;
     }
 
@@ -76,7 +78,7 @@ const Relatorios = () => {
       setRegistros(response.data);
     } catch (error) {
       console.error(error);
-      alert('Erro ao buscar relatório');
+      enqueueSnackbar('Erro ao buscar relatório', { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -128,7 +130,7 @@ const Relatorios = () => {
             onClick={buscarRelatorio}
             disabled={loading}
           >
-            {loading ? 'Carregando...' : 'Buscar'}
+            {'Buscar'}
           </Button>
         </Box>
 

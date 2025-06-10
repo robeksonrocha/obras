@@ -1,10 +1,12 @@
 com\obra\pontoeletronico\adapter\in\web\config\SecurityConfig.class
+com\obra\pontoeletronico\adapter\in\web\controller\UsuarioController.class
 com\obra\pontoeletronico\domain\model\Obra.class
 com\obra\pontoeletronico\domain\port\out\UsuarioRepository.class
 com\obra\pontoeletronico\adapter\in\web\AuthController.class
 com\obra\pontoeletronico\domain\service\FuncionarioService.class
 com\obra\pontoeletronico\adapter\in\web\response\AuthResponse.class
 com\obra\pontoeletronico\domain\service\RegistroPontoService.class
+com\obra\pontoeletronico\domain\port\in\UsuarioUseCase.class
 com\obra\pontoeletronico\adapter\in\web\ObraController.class
 com\obra\pontoeletronico\adapter\in\web\request\RegisterRequest.class
 com\obra\pontoeletronico\adapter\out\persistence\JpaRegistroPontoRepository.class
@@ -12,6 +14,7 @@ com\obra\pontoeletronico\domain\model\Funcionario.class
 com\obra\pontoeletronico\domain\port\in\ObraUseCase.class
 com\obra\pontoeletronico\adapter\in\web\controller\HealthController.class
 com\obra\pontoeletronico\domain\model\Usuario$UsuarioBuilder.class
+com\obra\pontoeletronico\adapter\in\web\controller\FuncionarioController.class
 com\obra\pontoeletronico\domain\service\ObraService.class
 com\obra\pontoeletronico\adapter\in\web\RegistroPontoController.class
 com\obra\pontoeletronico\domain\port\in\RegistroPontoUseCase.class
@@ -29,5 +32,6 @@ com\obra\pontoeletronico\adapter\out\persistence\JpaFuncionarioRepository.class
 com\obra\pontoeletronico\domain\service\AuthService.class
 com\obra\pontoeletronico\adapter\in\web\security\JwtAuthenticationFilter.class
 com\obra\pontoeletronico\PontoEletronicoApplication.class
+com\obra\pontoeletronico\domain\service\UsuarioService.class
 com\obra\pontoeletronico\adapter\out\persistence\JpaObraRepository.class
 com\obra\pontoeletronico\domain\port\in\AuthUseCase.class

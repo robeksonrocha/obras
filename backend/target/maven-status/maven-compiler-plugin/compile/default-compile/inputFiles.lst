@@ -15,6 +15,8 @@ C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletron
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\request\LoginRequest.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\domain\port\out\RegistroPontoRepository.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\RegistroPontoController.java
+C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\domain\port\in\UsuarioUseCase.java
+C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\controller\FuncionarioController.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\response\AuthResponse.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\PontoEletronicoApplication.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\domain\service\FuncionarioService.java
@@ -27,7 +29,9 @@ C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletron
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\domain\port\in\AuthUseCase.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\security\JwtAuthenticationFilter.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\ObraController.java
+C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\controller\UsuarioController.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\domain\port\out\FuncionarioRepository.java
+C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\domain\service\UsuarioService.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\request\RegisterRequest.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\out\persistence\JpaObraRepository.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\security\JwtTokenProvider.java

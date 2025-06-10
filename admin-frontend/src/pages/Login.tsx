@@ -23,11 +23,16 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await api.post('/auth/login', { email, senha });
-      localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
+      console.log('Login response:', response);
+      if (response.status === 200 && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        navigate('/dashboard');
+      } else {
+        alert('Usuário ou senha inválidos');
+      }
     } catch (error: any) {
-      console.error(error);
-      alert(error.response?.data?.message || 'Erro ao fazer login');
+      console.error('Login error:', error);
+      alert(error.response?.data?.message || 'Usuário ou senha inválidos');
     } finally {
       setLoading(false);
     }

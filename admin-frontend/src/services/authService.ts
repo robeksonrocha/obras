@@ -28,6 +28,7 @@ export const authService = {
 
     logout: () => {
         localStorage.removeItem('token');
+        console.log('Logout realizado: token removido');
     },
 
     getToken: (): string | null => {

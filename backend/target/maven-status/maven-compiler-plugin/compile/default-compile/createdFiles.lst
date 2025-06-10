@@ -1,5 +1,6 @@
 com\obra\pontoeletronico\adapter\in\web\config\SecurityConfig.class
 com\obra\pontoeletronico\adapter\in\web\controller\UsuarioController.class
+com\obra\pontoeletronico\config\OpenApiConfig.class
 com\obra\pontoeletronico\domain\model\Obra.class
 com\obra\pontoeletronico\domain\port\out\UsuarioRepository.class
 com\obra\pontoeletronico\adapter\in\web\AuthController.class

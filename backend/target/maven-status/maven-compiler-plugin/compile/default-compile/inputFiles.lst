@@ -15,6 +15,7 @@ C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletron
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\request\LoginRequest.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\domain\port\out\RegistroPontoRepository.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\RegistroPontoController.java
+C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\config\OpenApiConfig.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\domain\port\in\UsuarioUseCase.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\controller\FuncionarioController.java
 C:\dev\projeto\ponto-eletronico-obra\backend\src\main\java\com\obra\pontoeletronico\adapter\in\web\response\AuthResponse.java

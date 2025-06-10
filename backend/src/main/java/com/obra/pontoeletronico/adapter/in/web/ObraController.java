@@ -1,59 +1,53 @@
 package com.obra.pontoeletronico.adapter.in.web;
 
-import com.obra.pontoeletronico.adapter.out.persistence.ObraRepository;
-import com.obra.pontoeletronico.domain.Obra;
+import com.obra.pontoeletronico.domain.model.Obra;
+import com.obra.pontoeletronico.domain.port.in.ObraUseCase;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/obras")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"})
 public class ObraController {
 
-    private final ObraRepository obraRepository;
+    private final ObraUseCase obraUseCase;
 
-    @GetMapping
-    public List<Obra> listarTodas() {
-        return obraRepository.findAll();
-    }
-
-    @GetMapping("/ativas")
-    public List<Obra> listarAtivas() {
-        return obraRepository.findByStatus("EM_ANDAMENTO");
+    @PostMapping
+    public ResponseEntity<Obra> criarObra(@RequestBody Obra obra) {
+        Obra novaObra = obraUseCase.criarObra(obra);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novaObra);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Obra> buscarPorId(@PathVariable Long id) {
-        return obraRepository.findById(id)
+    public ResponseEntity<Obra> buscarObraPorId(@PathVariable Long id) {
+        return obraUseCase.buscarObraPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public Obra criar(@RequestBody Obra obra) {
-        obra.setId(null);
-        return obraRepository.save(obra);
+    @GetMapping
+    public ResponseEntity<List<Obra>> listarObras() {
+        List<Obra> obras = obraUseCase.listarObras();
+        return ResponseEntity.ok(obras);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Obra> atualizar(@PathVariable Long id, @RequestBody Obra obra) {
-        if (!obraRepository.existsById(id)) {
+    public ResponseEntity<Obra> atualizarObra(@PathVariable Long id, @RequestBody Obra obra) {
+        try {
+            Obra obraAtualizada = obraUseCase.atualizarObra(id, obra);
+            return ResponseEntity.ok(obraAtualizada);
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
-        obra.setId(id);
-        return ResponseEntity.ok(obraRepository.save(obra));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        if (!obraRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        obraRepository.deleteById(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> deletarObra(@PathVariable Long id) {
+        obraUseCase.deletarObra(id);
+        return ResponseEntity.noContent().build();
     }
 } 

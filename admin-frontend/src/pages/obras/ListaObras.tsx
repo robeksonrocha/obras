@@ -191,10 +191,10 @@ export default function ListaObras() {
                     <TableCell>{obra.cliente}</TableCell>
                     <TableCell>{obra.endereco}</TableCell>
                     <TableCell>
-                      {format(new Date(obra.dataInicio), 'dd/MM/yyyy')}
+                      {obra.dataInicio && !isNaN(new Date(obra.dataInicio).getTime()) ? format(new Date(obra.dataInicio), 'dd/MM/yyyy') : ''}
                     </TableCell>
                     <TableCell>
-                      {format(new Date(obra.dataPrevisaoFim), 'dd/MM/yyyy')}
+                      {obra.dataPrevisaoFim && !isNaN(new Date(obra.dataPrevisaoFim).getTime()) ? format(new Date(obra.dataPrevisaoFim), 'dd/MM/yyyy') : ''}
                     </TableCell>
                     <TableCell>{obra.status}</TableCell>
                     <TableCell>

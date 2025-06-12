@@ -45,4 +45,16 @@ public class RegistroPontoService implements RegistroPontoUseCase {
     public List<RegistroPonto> listarRegistrosPorObraEData(Long obraId, LocalDate data) {
         return registroPontoRepository.findByObraIdAndData(obraId, data);
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<RegistroPonto> listarRegistrosComFiltro(Long funcionarioId, Long obraId, LocalDate dataInicio, LocalDate dataFim) {
+        List<RegistroPonto> todos = registroPontoRepository.findAll();
+        return todos.stream()
+            .filter(r -> funcionarioId == null || r.getFuncionario().getId().equals(funcionarioId))
+            .filter(r -> obraId == null || (r.getFuncionario().getObra() != null && r.getFuncionario().getObra().getId().equals(obraId)))
+            .filter(r -> dataInicio == null || !r.getDataHora().toLocalDate().isBefore(dataInicio))
+            .filter(r -> dataFim == null || !r.getDataHora().toLocalDate().isAfter(dataFim))
+            .toList();
+    }
 } 

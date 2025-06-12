@@ -19,7 +19,11 @@ import {
   Stack,
   Snackbar,
   Alert,
-  CircularProgress
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -27,6 +31,7 @@ import {
   Add as AddIcon
 } from '@mui/icons-material';
 import { funcionarioService, Funcionario } from '../../services/funcionarioService';
+import { obraService, Obra } from '../../services/obraService';
 import { format } from 'date-fns';
 
 const formatarTelefone = (telefone: string): string => {
@@ -51,6 +56,7 @@ const formatarTelefone = (telefone: string): string => {
 
 export default function ListaFuncionarios() {
   const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
+  const [obras, setObras] = useState<Obra[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [funcionarioEdit, setFuncionarioEdit] = useState<Funcionario | null>(null);
@@ -64,11 +70,13 @@ export default function ListaFuncionarios() {
     dataAdmissao: format(new Date(), 'yyyy-MM-dd'),
     telefone: '',
     email: '',
-    ativo: true
+    ativo: true,
+    obraId: 0
   };
 
   useEffect(() => {
     carregarFuncionarios();
+    carregarObras();
   }, []);
 
   const carregarFuncionarios = async () => {
@@ -82,6 +90,16 @@ export default function ListaFuncionarios() {
       setFuncionarios([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const carregarObras = async () => {
+    try {
+      const data = await obraService.listarTodas();
+      setObras(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Erro ao carregar obras:', error);
+      setObras([]);
     }
   };
 
@@ -115,6 +133,9 @@ export default function ListaFuncionarios() {
     if (!funcionarioEdit?.telefone) {
       novosErros.telefone = 'Telefone é obrigatório';
     }
+    if (!funcionarioEdit?.obraId || funcionarioEdit.obraId === 0) {
+      novosErros.obraId = 'Obra é obrigatória';
+    }
 
     setErrors(novosErros);
     return Object.keys(novosErros).length === 0;
@@ -128,11 +149,17 @@ export default function ListaFuncionarios() {
     try {
       if (!funcionarioEdit) return;
 
+      const funcionarioData = {
+        ...funcionarioEdit,
+        usuario: { id: 1 },
+        obra: { id: Number(funcionarioEdit.obraId) }
+      };
+
       if (funcionarioEdit.id) {
-        await funcionarioService.atualizar(funcionarioEdit.id, funcionarioEdit);
+        await funcionarioService.atualizar(funcionarioEdit.id, funcionarioData);
         setSnackbar({ open: true, message: 'Funcionário atualizado com sucesso', severity: 'success' });
       } else {
-        await funcionarioService.criar(funcionarioEdit);
+        await funcionarioService.criar(funcionarioData);
         setSnackbar({ open: true, message: 'Funcionário criado com sucesso', severity: 'success' });
       }
 
@@ -200,7 +227,9 @@ export default function ListaFuncionarios() {
                     <TableCell>{funcionario.cpf}</TableCell>
                     <TableCell>{funcionario.cargo}</TableCell>
                     <TableCell>
-                      {format(new Date(funcionario.dataAdmissao), 'dd/MM/yyyy')}
+                      {(funcionario.dataAdmissao && !isNaN(new Date(funcionario.dataAdmissao).getTime()))
+                        ? format(new Date(funcionario.dataAdmissao), 'dd/MM/yyyy')
+                        : ''}
                     </TableCell>
                     <TableCell>{funcionario.telefone}</TableCell>
                     <TableCell>{funcionario.email}</TableCell>
@@ -267,6 +296,21 @@ export default function ListaFuncionarios() {
                   error={!!errors.dataAdmissao}
                   helperText={errors.dataAdmissao}
                 />
+                <FormControl fullWidth required error={!!errors.obraId}>
+                  <InputLabel id="obra-label">Obra</InputLabel>
+                  <Select
+                    labelId="obra-label"
+                    value={funcionarioEdit?.obraId || ''}
+                    label="Obra"
+                    onChange={e => setFuncionarioEdit(prev => prev ? { ...prev, obraId: Number(e.target.value) } : null)}
+                  >
+                    <MenuItem value="">Selecione uma obra</MenuItem>
+                    {obras.map(obra => (
+                      <MenuItem key={obra.id} value={obra.id}>{obra.nome}</MenuItem>
+                    ))}
+                  </Select>
+                  {errors.obraId && <Typography color="error" variant="caption">{errors.obraId}</Typography>}
+                </FormControl>
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                 <TextField

@@ -114,7 +114,9 @@ export default function ListaRegistrosPonto() {
     const carregarRegistros = async () => {
         try {
             setLoading(true);
+            console.log('[RegistrosPonto] Buscando registros com filtros:', filtros);
             const data = await registroPontoService.buscarRegistros(filtros);
+            console.log('[RegistrosPonto] Resposta recebida:', data);
             setRegistros(Array.isArray(data) ? data : []);
             if (!data || (Array.isArray(data) && data.length === 0)) {
                 enqueueSnackbar('Nenhum registro encontrado para os filtros selecionados.', { 
@@ -123,12 +125,22 @@ export default function ListaRegistrosPonto() {
                 });
             }
         } catch (error) {
-            console.error('Erro ao carregar registros:', error);
+            console.error('[RegistrosPonto] Erro ao carregar registros:', error);
+            if (error && typeof error === 'object' && 'response' in error) {
+                // AxiosError
+                const err = error as any;
+                console.error('[RegistrosPonto] Detalhes do erro:', err.response);
+                enqueueSnackbar(`Erro ao carregar registros: ${err.response?.status} ${err.response?.statusText}`, { 
+                    variant: 'error',
+                    autoHideDuration: 4000
+                });
+            } else {
+                enqueueSnackbar('Erro ao carregar registros. Tente novamente.', { 
+                    variant: 'error',
+                    autoHideDuration: 4000
+                });
+            }
             setRegistros([]);
-            enqueueSnackbar('Erro ao carregar registros. Tente novamente.', { 
-                variant: 'error',
-                autoHideDuration: 3000
-            });
         } finally {
             setLoading(false);
         }

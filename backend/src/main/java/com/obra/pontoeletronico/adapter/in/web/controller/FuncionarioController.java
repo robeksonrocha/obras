@@ -5,6 +5,8 @@ import com.obra.pontoeletronico.domain.port.in.FuncionarioUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.util.List;
 @Tag(name = "Funcionário", description = "Operações de CRUD para funcionários")
 public class FuncionarioController {
     private final FuncionarioUseCase funcionarioUseCase;
+    private static final Logger logger = LoggerFactory.getLogger(FuncionarioController.class);
 
     @GetMapping
     @Operation(summary = "Listar todos os funcionários")
@@ -35,6 +38,16 @@ public class FuncionarioController {
     @PostMapping
     @Operation(summary = "Criar novo funcionário")
     public ResponseEntity<Funcionario> criar(@RequestBody Funcionario funcionario) {
+        logger.info("[FuncionarioController] Recebido obraId: {} para funcionário {}", funcionario.getObra() != null ? funcionario.getObra().getId() : null, funcionario.getNome());
+        logger.debug("[FuncionarioController] Parâmetros recebidos para novo funcionário: nome={}, cpf={}, cargo={}, telefone={}, ativo={}, obraId={}, usuarioId={}",
+                funcionario.getNome(),
+                funcionario.getCpf(),
+                funcionario.getCargo(),
+                funcionario.getTelefone(),
+                funcionario.isAtivo(),
+                funcionario.getObra() != null ? funcionario.getObra().getId() : null,
+                funcionario.getUsuario() != null ? funcionario.getUsuario().getId() : null
+        );
         Funcionario novo = funcionarioUseCase.criarFuncionario(funcionario);
         return ResponseEntity.status(HttpStatus.CREATED).body(novo);
     }

@@ -11,4 +11,5 @@ public interface RegistroPontoUseCase {
     List<RegistroPonto> listarRegistrosPorFuncionario(Long funcionarioId);
     List<RegistroPonto> listarRegistrosPorFuncionarioEData(Long funcionarioId, LocalDate data);
     List<RegistroPonto> listarRegistrosPorObraEData(Long obraId, LocalDate data);
+    List<RegistroPonto> listarRegistrosComFiltro(Long funcionarioId, Long obraId, LocalDate dataInicio, LocalDate dataFim);
 } 

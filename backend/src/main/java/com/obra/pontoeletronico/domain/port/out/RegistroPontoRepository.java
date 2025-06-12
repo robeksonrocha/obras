@@ -11,4 +11,5 @@ public interface RegistroPontoRepository {
     List<RegistroPonto> findByFuncionarioId(Long funcionarioId);
     List<RegistroPonto> findByFuncionarioIdAndData(Long funcionarioId, LocalDate data);
     List<RegistroPonto> findByObraIdAndData(Long obraId, LocalDate data);
+    List<RegistroPonto> findAll();
 } 

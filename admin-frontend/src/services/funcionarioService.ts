@@ -9,6 +9,7 @@ export interface Funcionario {
   telefone: string;
   email: string;
   ativo: boolean;
+  obraId: number;
 }
 
 export const funcionarioService = {

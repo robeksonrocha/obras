@@ -134,4 +134,53 @@ O aplicativo mobile utiliza:
 
 ## Suporte
 
-Para suporte, entre em contato através do email: seu-email@exemplo.com 
+Para suporte, entre em contato através do email: seu-email@exemplo.com
+
+## Executando o Aplicativo Mobile
+
+### Pré-requisitos
+- Node.js 18+
+- npm ou yarn
+- Expo Go (aplicativo) instalado no celular para testes
+- Android Studio com emulador configurado (opcional, para testes no emulador)
+
+### Instalação
+```bash
+cd mobile-app
+npm install
+```
+
+### Executando o Aplicativo
+
+1. Versão Web:
+```bash
+npm run web
+```
+O aplicativo web abrirá automaticamente em seu navegador no endereço: http://localhost:8083
+
+2. No Emulador Android:
+- Primeiro, inicie o emulador Android pelo Android Studio
+- Execute o comando:
+```bash
+npm run android
+```
+
+3. No Seu Celular:
+- Instale o aplicativo "Expo Go" da Play Store (Android) ou App Store (iOS)
+- Execute o comando:
+```bash
+npm start
+```
+- Escaneie o QR Code que aparecerá no terminal usando:
+  - Android: o próprio aplicativo Expo Go
+  - iOS: a câmera do celular
+
+### Observações Importantes
+- Certifique-se que seu celular e computador estão na mesma rede Wi-Fi
+- Para desenvolvimento, mantenha o backend rodando (porta 8080)
+- Use as teclas no terminal para:
+  - `a` - abrir no emulador Android
+  - `i` - abrir no simulador iOS (apenas macOS)
+  - `w` - abrir na versão web
+  - `r` - recarregar o aplicativo
+  - `m` - abrir o menu do Expo 

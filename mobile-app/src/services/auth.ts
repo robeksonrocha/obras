@@ -2,9 +2,6 @@ import axios from 'axios';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Configuração da API
-const API_URL = 'http://localhost:8080';
-
 // Interfaces
 interface LoginRequest {
   email: string;
@@ -17,7 +14,6 @@ interface LoginResponse {
 
 // Criação da instância do axios
 export const api = axios.create({
-  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -64,7 +60,7 @@ export const authService = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     try {
       console.log('Iniciando tentativa de login:', {
-        url: `${API_URL}/api/auth/login`,
+        url: '/api/auth/login',
         credentials: {
           email: credentials.email,
           senha: '***'
@@ -95,7 +91,7 @@ export const authService = {
           throw new Error('Email ou senha inválidos');
         }
         if (error.response?.status === 404) {
-          throw new Error(`Servidor não encontrado. URL: ${API_URL}/api/auth/login`);
+          throw new Error('Servidor não encontrado. Verifique se o backend está rodando.');
         }
         if (!error.response) {
           throw new Error('Erro de conexão com o servidor. Verifique se o backend está rodando.');

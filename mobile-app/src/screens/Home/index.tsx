@@ -12,7 +12,7 @@ import { pointService } from '../../services/point';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../App';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -22,18 +22,30 @@ interface UltimoRegistro {
   dataHora: string;
 }
 
+type PointType = 'ENTRADA' | 'SAIDA_ALMOCO' | 'RETORNO_ALMOCO' | 'SAIDA';
+
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [loading, setLoading] = useState(false);
   const [ultimoRegistro, setUltimoRegistro] = useState<UltimoRegistro | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     carregarUltimoRegistro();
+
+    // Atualiza o horário a cada segundo
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    // Limpa o intervalo quando o componente é desmontado
+    return () => clearInterval(timer);
   }, []);
 
   const carregarUltimoRegistro = async () => {
     try {
       const response = await pointService.getLastPoint();
+      console.log('Último registro carregado:', response);
       setUltimoRegistro(response);
     } catch (error) {
       console.error('Erro ao carregar último registro:', error);
@@ -53,8 +65,9 @@ export default function HomeScreen() {
       setLoading(true);
       const tipo = getNextPointType();
       const response = await pointService.register(tipo);
+      console.log('Ponto registrado:', response);
       await carregarUltimoRegistro();
-      Alert.alert('Sucesso', `Ponto registrado com sucesso!\nTipo: ${formatTipo(response.type)}`);
+      Alert.alert('Sucesso', `Ponto registrado com sucesso!\nTipo: ${formatTipo(tipo)}`);
     } catch (error) {
       Alert.alert(
         'Erro',
@@ -65,7 +78,7 @@ export default function HomeScreen() {
     }
   };
 
-  const getNextPointType = (): string => {
+  const getNextPointType = (): PointType => {
     if (!ultimoRegistro) return 'ENTRADA';
     
     switch (ultimoRegistro.tipo) {
@@ -81,7 +94,13 @@ export default function HomeScreen() {
   };
 
   const formatTipo = (tipo: string): string => {
-    return tipo.replace('_', ' ');
+    const tipos = {
+      'ENTRADA': 'Entrada',
+      'SAIDA_ALMOCO': 'Saída Almoço',
+      'RETORNO_ALMOCO': 'Retorno Almoço',
+      'SAIDA': 'Saída'
+    };
+    return tipos[tipo as keyof typeof tipos] || tipo;
   };
 
   const getButtonText = (): string => {
@@ -99,12 +118,36 @@ export default function HomeScreen() {
     }
   };
 
+  const formatDataHora = (dataHora: string | undefined): string => {
+    try {
+      if (!dataHora) {
+        console.error('Data/hora indefinida');
+        return '--:--';
+      }
+      
+      // Verifica se a string está no formato ISO
+      if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(dataHora)) {
+        console.error('Formato de data inválido:', dataHora);
+        return '--:--';
+      }
+
+      const data = parseISO(dataHora);
+      return format(data, "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return '--:--';
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Ponto Eletrônico</Text>
         <Text style={styles.date}>
-          {format(new Date(), "EEEE, dd 'de' MMMM", { locale: ptBR })}
+          {format(currentTime, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+        </Text>
+        <Text style={styles.currentTime}>
+          {format(currentTime, 'HH:mm:ss', { locale: ptBR })}
         </Text>
       </View>
 
@@ -112,32 +155,36 @@ export default function HomeScreen() {
         {ultimoRegistro && (
           <View style={styles.lastRecord}>
             <Text style={styles.lastRecordTitle}>Último Registro:</Text>
-            <Text style={styles.lastRecordText}>
-              {format(new Date(ultimoRegistro.dataHora), 'HH:mm')} -{' '}
+            <Text style={styles.lastRecordType}>
               {formatTipo(ultimoRegistro.tipo)}
+            </Text>
+            <Text style={styles.lastRecordTime}>
+              {formatDataHora(ultimoRegistro.dataHora)}
             </Text>
           </View>
         )}
 
-        <TouchableOpacity 
-          style={[styles.registerButton, loading && styles.buttonDisabled]}
-          onPress={handleRegisterPoint}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#FFF" size="small" />
-          ) : (
-            <Text style={styles.buttonText}>{getButtonText()}</Text>
-          )}
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={[styles.registerButton, loading && styles.buttonDisabled]}
+            onPress={handleRegisterPoint}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFF" size="small" />
+            ) : (
+              <Text style={styles.buttonText}>{getButtonText()}</Text>
+            )}
+          </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.logoutButton}
-          onPress={handleLogout}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>Sair</Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.logoutButton}
+            onPress={handleLogout}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>Sair</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -163,45 +210,64 @@ const styles = StyleSheet.create({
     color: '#FFF',
     marginTop: 5,
   },
+  currentTime: {
+    fontSize: 32,
+    color: '#FFF',
+    fontWeight: 'bold',
+    marginTop: 10,
+    fontFamily: 'monospace',
+  },
   content: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
   lastRecord: {
     backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 8,
+    padding: 20,
+    borderRadius: 10,
     marginBottom: 20,
-    width: '100%',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   lastRecordTitle: {
     fontSize: 16,
     color: '#666',
-    marginBottom: 5,
+    marginBottom: 10,
   },
-  lastRecordText: {
-    fontSize: 18,
+  lastRecordType: {
+    fontSize: 24,
     color: '#333',
     fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  lastRecordTime: {
+    fontSize: 16,
+    color: '#666',
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: 20,
   },
   registerButton: {
     backgroundColor: '#28a745',
     padding: 15,
-    borderRadius: 8,
-    width: '100%',
+    borderRadius: 10,
     alignItems: 'center',
     marginBottom: 10,
   },
   logoutButton: {
     backgroundColor: '#DC3545',
     padding: 15,
-    borderRadius: 8,
-    width: '100%',
+    borderRadius: 10,
     alignItems: 'center',
-    marginTop: 10,
   },
   buttonDisabled: {
     backgroundColor: '#999',
@@ -210,5 +276,5 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
+  }
 }); 

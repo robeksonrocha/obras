@@ -18,29 +18,89 @@ import { authService } from '../../services/auth';
 type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 
 function LoginScreen() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const isValidCPF = (cpf: string): boolean => {
+    // Remove caracteres não numéricos
+    const numericCPF = cpf.replace(/\D/g, '');
+    
+    // Verifica se tem 11 dígitos
+    if (numericCPF.length !== 11) return false;
+
+    // Verifica se todos os dígitos são iguais
+    if (/^(\d)\1{10}$/.test(numericCPF)) return false;
+
+    // Validação do dígito verificador
+    let sum = 0;
+    let remainder;
+
+    // Primeiro dígito verificador
+    for (let i = 1; i <= 9; i++) {
+      sum += parseInt(numericCPF.substring(i - 1, i)) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(numericCPF.substring(9, 10))) return false;
+
+    // Segundo dígito verificador
+    sum = 0;
+    for (let i = 1; i <= 10; i++) {
+      sum += parseInt(numericCPF.substring(i - 1, i)) * (12 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(numericCPF.substring(10, 11))) return false;
+
+    return true;
+  };
+
+  const validateIdentifier = (value: string): boolean => {
+    // Remove espaços em branco
+    const trimmedValue = value.trim();
+    
+    // Verifica se está vazio
+    if (!trimmedValue) {
+      setErrorMessage('Por favor, insira seu email ou CPF');
+      return false;
+    }
+
+    // Verifica se é um email válido ou um CPF válido
+    if (!isValidEmail(trimmedValue) && !isValidCPF(trimmedValue)) {
+      setErrorMessage('Por favor, insira um email ou CPF válido');
+      return false;
+    }
+
+    return true;
+  };
+
   const handleLogin = async () => {
     setErrorMessage('');
 
-    if (!email.trim() || !senha.trim()) {
+    if (!identifier.trim() || !senha.trim()) {
       setErrorMessage('Por favor, preencha todos os campos');
       return;
     }
 
-    if (!email.includes('@')) {
-      setErrorMessage('Por favor, insira um email válido');
+    if (!validateIdentifier(identifier)) {
       return;
     }
 
     try {
       setLoading(true);
       
-      const response = await authService.login({ email, senha });
+      const response = await authService.login({ 
+        email: identifier, // O backend deve ser capaz de identificar se é email ou CPF
+        senha 
+      });
       
       // Verifica se a resposta contém um token válido (formato JWT)
       if (!response.token || typeof response.token !== 'string' || !response.token.includes('.')) {
@@ -62,7 +122,7 @@ function LoginScreen() {
         index: 0,
         routes: [{ 
           name: 'Home',
-          params: { email }
+          params: { email: identifier }
         }],
       });
       
@@ -70,7 +130,7 @@ function LoginScreen() {
       console.error('Erro no login:', error);
       if (error instanceof Error) {
         if (error.message.includes('401') || error.message.includes('inválidos')) {
-          setErrorMessage('Email ou senha incorretos');
+          setErrorMessage('Email/CPF ou senha incorretos');
         } else if (error.message.includes('conexão')) {
           setErrorMessage('Erro de conexão com o servidor. Tente novamente.');
         } else if (error.message.includes('Token')) {
@@ -103,10 +163,10 @@ function LoginScreen() {
         
         <TextInput
           style={[styles.input, errorMessage ? styles.inputError : null]}
-          placeholder="Email"
-          value={email}
+          placeholder="Email ou CPF"
+          value={identifier}
           onChangeText={(text) => {
-            setEmail(text);
+            setIdentifier(text);
             setErrorMessage('');
           }}
           keyboardType="email-address"

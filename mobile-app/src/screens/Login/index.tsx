@@ -60,7 +60,10 @@ function LoginScreen() {
       // Navega para a tela Home
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Home' }],
+        routes: [{ 
+          name: 'Home',
+          params: { email }
+        }],
       });
       
     } catch (error) {

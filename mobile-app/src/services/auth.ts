@@ -9,6 +9,11 @@ interface LoginRequest {
 
 interface LoginResponse {
   token: string;
+  usuario: {
+    nome: string;
+    email: string;
+    role: string;
+  };
 }
 
 // Função auxiliar para validar o formato do token JWT
@@ -61,8 +66,17 @@ export const authService = {
         throw new Error('Token JWT inválido recebido do servidor');
       }
 
-      // Salva o token no AsyncStorage
+      // Salva o token e os dados do usuário no AsyncStorage
       await AsyncStorage.setItem('@PontoEletronico:token', response.data.token);
+      
+      // Verifica se os dados do usuário são válidos antes de salvar
+      if (response.data.usuario && 
+          typeof response.data.usuario === 'object' && 
+          response.data.usuario.nome) {
+        await AsyncStorage.setItem('@PontoEletronico:usuario', JSON.stringify(response.data.usuario));
+      } else {
+        console.warn('Dados do usuário ausentes ou inválidos na resposta do login');
+      }
       
       return response.data;
     } catch (error: any) {
@@ -88,9 +102,37 @@ export const authService = {
 
   logout: async () => {
     await AsyncStorage.removeItem('@PontoEletronico:token');
+    await AsyncStorage.removeItem('@PontoEletronico:usuario');
   },
 
   getToken: async () => {
     return await AsyncStorage.getItem('@PontoEletronico:token');
+  },
+
+  getUsuario: async () => {
+    try {
+      const usuarioString = await AsyncStorage.getItem('@PontoEletronico:usuario');
+      
+      // Retorna null se o valor for null, undefined ou a string "undefined"
+      if (!usuarioString || usuarioString === "undefined" || usuarioString === "null") {
+        return null;
+      }
+
+      const usuario = JSON.parse(usuarioString);
+      
+      // Verifica se o objeto do usuário tem a estrutura esperada
+      if (!usuario || typeof usuario !== 'object' || !usuario.nome) {
+        console.warn('Dados do usuário inválidos no AsyncStorage');
+        await AsyncStorage.removeItem('@PontoEletronico:usuario');
+        return null;
+      }
+      
+      return usuario;
+    } catch (error) {
+      console.error('Erro ao recuperar dados do usuário:', error);
+      // Em caso de erro, remove os dados inválidos
+      await AsyncStorage.removeItem('@PontoEletronico:usuario');
+      return null;
+    }
   }
 }; 

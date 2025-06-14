@@ -9,13 +9,14 @@ import {
 } from 'react-native';
 import { authService } from '../../services/auth';
 import { pointService } from '../../services/point';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../../App';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+type HomeScreenRouteProp = NativeStackScreenProps<RootStackParamList, 'Home'>['route'];
 
 interface UltimoRegistro {
   tipo: 'ENTRADA' | 'SAIDA_ALMOCO' | 'RETORNO_ALMOCO' | 'SAIDA';
@@ -26,6 +27,8 @@ type PointType = 'ENTRADA' | 'SAIDA_ALMOCO' | 'RETORNO_ALMOCO' | 'SAIDA';
 
 export default function HomeScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const route = useRoute<HomeScreenRouteProp>();
+  const { email } = route.params;
   const [loading, setLoading] = useState(false);
   const [ultimoRegistro, setUltimoRegistro] = useState<UltimoRegistro | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -142,13 +145,16 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Ponto Eletrônico</Text>
-        <Text style={styles.date}>
-          {format(currentTime, "EEEE, dd 'de' MMMM", { locale: ptBR })}
-        </Text>
-        <Text style={styles.currentTime}>
-          {format(currentTime, 'HH:mm:ss', { locale: ptBR })}
-        </Text>
+        <View style={styles.headerLeft}>
+          <Text style={styles.title}>Ponto Eletrônico</Text>
+          <Text style={styles.date}>
+            {format(currentTime, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+          </Text>
+          <Text style={styles.currentTime}>
+            {format(currentTime, 'HH:mm:ss', { locale: ptBR })}
+          </Text>
+        </View>
+        <Text style={styles.userName}>{email}</Text>
       </View>
 
       <View style={styles.content}>
@@ -196,14 +202,25 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   header: {
-    backgroundColor: '#0066CC',
+    backgroundColor: '#007AFF',
     padding: 20,
-    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerLeft: {
+    flex: 1,
   },
   title: {
     fontSize: 24,
     color: '#FFF',
     fontWeight: 'bold',
+  },
+  userName: {
+    fontSize: 16,
+    color: '#FFF',
+    fontWeight: '500',
+    textAlign: 'right',
   },
   date: {
     fontSize: 16,

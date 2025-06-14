@@ -6,7 +6,9 @@ import HomeScreen from './src/screens/Home/index';
 
 export type RootStackParamList = {
   Login: undefined;
-  Home: undefined;
+  Home: {
+    email: string;
+  };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

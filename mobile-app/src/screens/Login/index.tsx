@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  StyleSheet
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -19,11 +21,19 @@ function LoginScreen() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
-    if (!email || !senha) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+    setErrorMessage('');
+
+    if (!email.trim() || !senha.trim()) {
+      setErrorMessage('Por favor, preencha todos os campos');
+      return;
+    }
+
+    if (!email.includes('@')) {
+      setErrorMessage('Por favor, insira um email válido');
       return;
     }
 
@@ -41,58 +51,86 @@ function LoginScreen() {
       
     } catch (error) {
       console.error('Erro no login:', error);
-      Alert.alert(
-        'Erro',
-        error instanceof Error ? error.message : 'Erro ao fazer login'
-      );
+      if (error instanceof Error) {
+        if (error.message.includes('401') || error.message.includes('inválidos')) {
+          setErrorMessage('Email ou senha incorretos');
+        } else if (error.message.includes('conexão')) {
+          setErrorMessage('Erro de conexão com o servidor. Tente novamente.');
+        } else {
+          setErrorMessage(error.message);
+        }
+      } else {
+        setErrorMessage('Ocorreu um erro inesperado. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Ponto Eletrônico</Text>
-      <Text style={styles.subtitle}>Controle de Acesso</Text>
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={senha}
-        onChangeText={setSenha}
-        secureTextEntry
-      />
-      
-      <TouchableOpacity
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={handleLogin}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#FFF" size="small" />
-        ) : (
-          <Text style={styles.buttonText}>Entrar</Text>
-        )}
-      </TouchableOpacity>
-    </View>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <View style={styles.content}>
+        <Text style={styles.title}>Ponto Eletrônico</Text>
+        <Text style={styles.subtitle}>Controle de Acesso</Text>
+        
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
+        
+        <TextInput
+          style={[styles.input, errorMessage ? styles.inputError : null]}
+          placeholder="Email"
+          value={email}
+          onChangeText={(text) => {
+            setEmail(text);
+            setErrorMessage('');
+          }}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+        
+        <TextInput
+          style={[styles.input, errorMessage ? styles.inputError : null]}
+          placeholder="Senha"
+          value={senha}
+          onChangeText={(text) => {
+            setSenha(text);
+            setErrorMessage('');
+          }}
+          secureTextEntry
+        />
+        
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#FFF" size="small" />
+          ) : (
+            <Text style={styles.buttonText}>Entrar</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#F5F5F5',
   },
   title: {
     fontSize: 28,
@@ -107,13 +145,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#666',
   },
+  errorContainer: {
+    backgroundColor: '#FFE8E8',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#FFB6B6',
+  },
+  errorText: {
+    color: '#D32F2F',
+    textAlign: 'center',
+    fontSize: 14,
+  },
   input: {
     backgroundColor: '#FFF',
     borderRadius: 5,
-    padding: 10,
+    padding: 15,
     marginBottom: 10,
     borderWidth: 1,
     borderColor: '#DDD',
+    fontSize: 16,
+  },
+  inputError: {
+    borderColor: '#D32F2F',
   },
   button: {
     backgroundColor: '#007AFF',

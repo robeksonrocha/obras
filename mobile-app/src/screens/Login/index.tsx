@@ -41,7 +41,21 @@ function LoginScreen() {
       setLoading(true);
       
       const response = await authService.login({ email, senha });
-      console.log('Login realizado com sucesso:', response);
+      
+      // Verifica se a resposta contém um token válido (formato JWT)
+      if (!response.token || typeof response.token !== 'string' || !response.token.includes('.')) {
+        setErrorMessage('Erro de autenticação: token inválido');
+        return;
+      }
+      
+      // Verifica se o token tem o formato correto (três partes separadas por ponto)
+      const tokenParts = response.token.split('.');
+      if (tokenParts.length !== 3) {
+        setErrorMessage('Erro de autenticação: formato de token inválido');
+        return;
+      }
+      
+      console.log('Login realizado com sucesso');
       
       // Navega para a tela Home
       navigation.reset({
@@ -56,6 +70,8 @@ function LoginScreen() {
           setErrorMessage('Email ou senha incorretos');
         } else if (error.message.includes('conexão')) {
           setErrorMessage('Erro de conexão com o servidor. Tente novamente.');
+        } else if (error.message.includes('Token')) {
+          setErrorMessage('Erro de autenticação: ' + error.message);
         } else {
           setErrorMessage(error.message);
         }
